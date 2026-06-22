@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Abogados Dijeron - Juego</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="tv-logo mini-logo" aria-label="100 Abogados Dijeron">
+                <span class="logo-shape shape-green"></span>
+                <span class="logo-shape shape-yellow"></span>
+                <span class="logo-shape shape-blue"></span>
+                <span class="logo-shape shape-purple"></span>
+                <span class="logo-shape shape-red"></span>
+                <span class="logo-100">100</span>
+                <span class="logo-main">ABOGADOS</span>
+                <span class="logo-bottom">DIJERON</span>
+            </div>
+            <div class="header-controls">
+                <button class="back-btn" onclick="window.location.href='admin.html'" title="Ir a administración">
+                    ⚙ Admin
+                </button>
+                <button class="fullscreen-toggle" id="fullscreenToggle" title="Pantalla completa">
+                    ⛶
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- PANTALLA 1: INICIO -->
+            <div class="game-start-screen active" id="startScreen">
+                <div class="tv-logo start-logo" aria-label="100 Abogados Dijeron">
+                    <span class="logo-shape shape-green"></span>
+                    <span class="logo-shape shape-yellow"></span>
+                    <span class="logo-shape shape-blue"></span>
+                    <span class="logo-shape shape-purple"></span>
+                    <span class="logo-shape shape-red"></span>
+                    <span class="logo-100">100</span>
+                    <span class="logo-main">ABOGADOS</span>
+                    <span class="logo-bottom">DIJERON</span>
+                </div>
+                <div class="start-prompt" onclick="window.gameStart()">
+                    [ Presiona ENTER o haz CLICK para comenzar ]
+                </div>
+            </div>
+
+            <!-- PANTALLA 2: INSTRUCCIONES -->
+            <div class="game-instructions-screen" id="instructionsScreen">
+                <div class="instructions-content">
+                    <h2>Cómo jugar</h2>
+                    <ul>
+                        <li>Haz click en un número para revelar la respuesta</li>
+                        <li>Selecciona qué equipo dijo esa respuesta (1 o 2)</li>
+                        <li>Los puntos se suman automáticamente según la respuesta</li>
+                        <li>Presiona "E" para agregar error a un equipo</li>
+                        <li>3 errores por equipo = pérdida de turno</li>
+                        <li>Gana el equipo con más puntos al final</li>
+                    </ul>
+                    <button class="btn btn-primary btn-large" onclick="gameContinue()">
+                        Continuar
+                    </button>
+                </div>
+            </div>
+
+            <!-- PANTALLA 3: CONFIGURACIÓN -->
+            <div class="game-setup-screen" id="setupScreen">
+                <div class="setup-card">
+                    <div class="survey-indicator" id="surveyIndicator">Encuesta #1</div>
+                    <h2>Configurar Partida</h2>
+
+                    <div class="teams-setup">
+                        <div class="team-input">
+                            <label for="team1Name">Equipo 1</label>
+                            <input type="text" id="team1Name" value="Equipo A">
+                        </div>
+                        <div class="team-input">
+                            <label for="team2Name">Equipo 2</label>
+                            <input type="text" id="team2Name" value="Equipo B">
+                        </div>
+                    </div>
+
+                    <div class="round-question-setup">
+                        <div class="team-input">
+                            <label for="setupCategory">Categoría de la ronda</label>
+                            <select id="setupCategory"></select>
+                        </div>
+                        <div class="timer-setup" style="justify-content: center;">
+                            <label>
+                                <input type="checkbox" id="randomQuestion" checked> Pregunta aleatoria
+                            </label>
+                        </div>
+                        <div class="team-input">
+                            <label for="setupQuestionNumber">Número de pregunta</label>
+                            <select id="setupQuestionNumber" disabled></select>
+                        </div>
+                    </div>
+
+                    <div class="timer-setup">
+                        <label>
+                            <input type="checkbox" id="enableTimer"> Activar
+                        </label>
+                        <input type="number" id="timerSeconds" value="30" min="5" max="999" disabled>
+                        <span>segundos</span>
+                    </div>
+
+                    <button class="btn btn-primary btn-large" id="startRoundBtn" onclick="game.startRound()">
+                        Iniciar
+                    </button>
+                </div>
+            </div>
+
+            <!-- PANTALLA 4: TABLERO DE JUEGO -->
+            <div class="game-board-screen" id="gameBoardScreen">
+                <div class="game-board-container tv-stage">
+                    <div class="bulb-frame" aria-hidden="true"></div>
+                    <div class="tv-top-row tv-top-row-deluxe">
+                        <div class="tv-logo board-logo board-logo-left" aria-label="100 Abogados Dijeron">
+                            <span class="logo-shape shape-green"></span>
+                            <span class="logo-shape shape-yellow"></span>
+                            <span class="logo-shape shape-blue"></span>
+                            <span class="logo-shape shape-purple"></span>
+                            <span class="logo-shape shape-red"></span>
+                            <span class="logo-100">100</span>
+                            <span class="logo-main">ABOGADOS</span>
+                            <span class="logo-bottom">DIJERON</span>
+                        </div>
+
+                        <div class="category-panel">
+                            <div class="tv-card-title">CATEGORÍA</div>
+                            <div class="category-chip" id="gameCategory">Derecho</div>
+                        </div>
+
+                        <div class="question-panel">
+                            <div class="tv-card-title">PREGUNTA</div>
+                            <h2 id="gameQuestion"></h2>
+                        </div>
+
+                        <div class="round-card">
+                            <div class="tv-card-title">RONDA</div>
+                            <div class="round-value" id="roundIndicator">1 / 4</div>
+                        </div>
+                    </div>
+
+                    <div class="scoreboard-compact">
+                        <div class="team-column team-1-column">
+                            <div class="team-name-large" id="team1DisplayName">Equipo A</div>
+                            <div class="score-value-large" id="team1Points">0</div>
+                            <div class="team-errors-clickable" onclick="game.showAssignErrorModal(1)">
+                                <span class="x-mark">X</span>
+                                <span id="team1Errors">0</span>
+                            </div>
+                        </div>
+
+                        <div class="center-info">
+                            <div class="timer-display" id="timerDisplay" style="display: none;">
+                                <span class="timer-value" id="timerValue">30</span>
+                            </div>
+                        </div>
+
+                        <div class="team-column team-2-column">
+                            <div class="team-name-large" id="team2DisplayName">Equipo B</div>
+                            <div class="score-value-large" id="team2Points">0</div>
+                            <div class="team-errors-clickable" onclick="game.showAssignErrorModal(2)">
+                                <span class="x-mark">X</span>
+                                <span id="team2Errors">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="answers-board" id="answersBoard"></div>
+                    <div class="round-hint" id="roundHint"><span id="revealedCount">0</span>/<span id="totalResponses">5</span> respuestas reveladas · al terminar el tiempo se muestran las faltantes</div>
+                    <div class="board-actions">
+                        <button class="btn btn-secondary board-reveal-missing-btn" onclick="game.revealMissingManually()" title="Revelar respuestas faltantes">
+                            Revelar faltantes
+                        </button>
+                        <button class="btn btn-danger board-end-round-btn" onclick="game.endRound()" title="Terminar ronda">
+                            Terminar ronda
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANTALLA 5: RESULTADOS -->
+            <div class="game-results-screen" id="resultsScreen">
+                <div class="results-card">
+                    <h2>¡Ronda Terminada!</h2>
+
+                    <div class="final-scores">
+                        <div class="final-score">
+                            <div class="final-score-team" id="finalTeam1Name">Equipo A</div>
+                            <div class="final-score-value" id="finalTeam1Score">0</div>
+                        </div>
+                        <div class="final-score">
+                            <div class="final-score-team" id="finalTeam2Name">Equipo B</div>
+                            <div class="final-score-value" id="finalTeam2Score">0</div>
+                        </div>
+                    </div>
+
+                    <div class="winner-display" id="winnerDisplay">
+                        Ganador: <span class="winner-name" id="winnerName">Equipo A</span>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-large" onclick="game.nextRound()">
+                            Siguiente Ronda
+                        </button>
+                        <button class="btn btn-secondary btn-large" onclick="game.showFinalResults()">
+                            Ver Resultados
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Modal: Asignar Respuesta -->
+        <div class="modal" id="assignModal">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>¿Qué equipo dijo esta respuesta?</h3>
+                    <button class="modal-close" onclick="game.closeAssignModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <div class="response-assign-display">
+                        <p class="response-text" id="modalResponseText">Respuesta</p>
+                        <p class="response-points" id="modalResponsePoints">0 puntos</p>
+                    </div>
+                    <input type="hidden" id="pendingResponseIndex" value="">
+                    <div class="assign-buttons">
+                        <button class="btn btn-primary btn-large" onclick="game.assignToTeam(1)" id="assignTeam1Btn">
+                            Equipo 1
+                        </button>
+                        <button class="btn btn-primary btn-large" onclick="game.assignToTeam(2)" id="assignTeam2Btn">
+                            Equipo 2
+                        </button>
+                    </div>
+                    <p style="margin-top: 20px; color: var(--text-muted); font-size: 0.9rem;">
+                        O presiona 1 o 2 en el teclado
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Asignar Error -->
+        <div class="modal" id="assignErrorModal">
+            <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h3>¿Qué equipo cometió el error?</h3>
+                    <button class="modal-close" onclick="game.closeAssignErrorModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <div class="assign-buttons">
+                        <button class="btn btn-danger btn-large" onclick="game.assignError(1)" id="errorTeam1Btn">
+                            Equipo 1
+                        </button>
+                        <button class="btn btn-danger btn-large" onclick="game.assignError(2)" id="errorTeam2Btn">
+                            Equipo 2
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
+    <script src="juego.js"></script>
+    <script>
+        function gameStart() {
+            if (typeof game !== 'undefined' && game.goToInstructions) {
+                game.goToInstructions();
+            } else {
+                console.error('Game not initialized yet');
+                setTimeout(gameStart, 100);
+            }
+        }
+        
+        function gameContinue() {
+            if (typeof game !== 'undefined' && game.goToSetup) {
+                game.goToSetup();
+            } else {
+                console.error('Game not initialized yet');
+                setTimeout(gameContinue, 100);
+            }
+        }
+        
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+        });
+    </script>
+	<div id="bigErrorX" class="big-error-x">✖</div>
+</body>
+</html>

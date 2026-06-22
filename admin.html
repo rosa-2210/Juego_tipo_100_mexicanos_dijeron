@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Abogados Dijeron - Administración</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="main-header">
+            <h1 class="logo">100 <span class="highlight">Abogados</span> Dijeron</h1>
+            <div class="header-controls">
+                <button class="back-btn" onclick="window.location.href='juego.html'" title="Ir al juego">
+                    ▶ Juego
+                </button>
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                    ◐
+                </button>
+                <button class="fullscreen-toggle" id="fullscreenToggle" title="Pantalla completa">
+                    ⛶
+                </button>
+            </div>
+        </header>
+
+        <nav class="main-nav">
+            <button class="nav-btn active" data-view="surveys">
+                Encuestas
+            </button>
+            <button class="nav-btn" data-view="history">
+                Historial
+            </button>
+            <button class="nav-btn" data-view="create">
+                Crear
+            </button>
+        </nav>
+
+        <main class="main-content">
+            <!-- SURVEYS LIST VIEW -->
+            <section class="view active" id="surveysView">
+                <h2 class="section-title">Administrar Encuestas</h2>
+
+                <div class="admin-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchSurveys" placeholder="Buscar por pregunta...">
+                    </div>
+                    <div class="filter-box">
+                        <select id="filterCategory">
+                            <option value="">Todas las categorías</option>
+                        </select>
+                    </div>
+                    <div class="import-export">
+                        <button class="btn btn-secondary" onclick="admin.exportSurveys()">
+                            Exportar
+                        </button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                            Importar
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="admin.importSurveys(this)">
+                    </div>
+                </div>
+
+                <div class="surveys-list" id="surveysList"></div>
+            </section>
+
+            <!-- CREATE/EDIT VIEW -->
+            <section class="view" id="createView">
+                <h2 class="section-title" id="formTitle">Crear Nueva Encuesta</h2>
+
+                <div class="card" style="max-width: 800px; margin: 0 auto;">
+                    <form class="survey-form" id="surveyForm">
+                        <input type="hidden" id="surveyId">
+
+                        <div class="form-group">
+                            <label for="surveyQuestion">Pregunta</label>
+                            <input type="text" id="surveyQuestion" placeholder="Ej: ¿Cuál es la principal razón para estudiar derecho?" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="surveyCategory">Categoría</label>
+                            <input type="text" id="surveyCategory" placeholder="Ej: Profesión, Carrera, Estudios" list="categoryList">
+                            <datalist id="categoryList"></datalist>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Respuestas (máximo 8)</label>
+                            <div class="responses-grid" id="responsesGrid"></div>
+                            <button type="button" class="add-response-btn" id="addResponseBtn">
+                                + Agregar Respuesta
+                            </button>
+                        </div>
+
+                        <div class="form-actions" style="display: flex; gap: 15px; justify-content: flex-end;">
+                            <button type="button" class="btn btn-secondary" onclick="admin.clearForm()">
+                                Limpiar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Guardar Encuesta
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="preview-panel">
+                        <h3>Vista Previa</h3>
+                        <div class="preview-board" id="previewBoard">
+                            <div class="preview-question" id="previewQuestion">Tu pregunta aparecerá aquí</div>
+                            <div class="preview-responses" id="previewResponses"></div>
+                        </div>
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: 20px;" onclick="admin.showGamePreview()">
+                            Vista de Juego
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORY VIEW -->
+            <section class="view" id="historyView">
+                <h2 class="section-title">Historial de Partidas</h2>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="stats-grid" style="margin: 0; flex: 1;">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalGamesStat">0</div>
+                                <div class="stat-label">Partidas Jugadas</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalRoundsStat">0</div>
+                                <div class="stat-label">Rondas Completadas</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="admin.exportHistory()" style="margin-left: 20px;">
+                            Exportar Historial
+                        </button>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Pregunta</th>
+                                <th>Equipo 1</th>
+                                <th>Equipo 2</th>
+                                <th>Ganador</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody"></tbody>
+                    </table>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-danger" onclick="admin.clearHistory()">
+                            Limpiar Historial
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Game Preview Modal -->
+        <div class="modal" id="previewModal">
+            <div class="modal-content" style="max-width: 900px;">
+                <div class="modal-header">
+                    <h3>Vista de Juego</h3>
+                    <button class="modal-close" onclick="admin.closePreviewModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="game-question-display" style="margin-bottom: 20px;">
+                        <h2 id="previewGameQuestion"></h2>
+                    </div>
+                    <div class="answers-board" id="previewGameBoard"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
